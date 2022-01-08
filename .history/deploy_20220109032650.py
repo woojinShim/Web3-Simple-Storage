@@ -35,12 +35,10 @@ bytecode = compiled_sol["contracts"]["SimpleStorage.sol"]["SimpleStorage"]["evm"
 # get abi
 abi = compiled_sol["contracts"]["SimpleStorage.sol"]["SimpleStorage"]["abi"]
 
-# for connecting to rinkeby
-w3 = Web3(
-    Web3.HTTPProvider("https://rinkeby.infura.io/v3/ba9a14c16cc54dc9922f3cbe47efc440")
-)
-chain_id = 4
-my_address = "0x0bE778DeA3aE2d119d6CE5acE9A8b44cF4174257"
+# for connecting to ganache
+w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
+chain_id = 1337
+my_address = "0xED8fDF13857B7d12252A05889EB7F14aA92205EC"
 private_key = os.getenv("PRIVATE_KEY")
 print(private_key)
 # 프라이빗키 쉘에 export해서 사용하기
@@ -63,15 +61,9 @@ transaction = SimpleStorage.constructor().buildTransaction(
 )
 # Sign the transaction
 signed_txn = w3.eth.account.sign_transaction(transaction, private_key=private_key)
-print("Deploying Contract!")
 
-# Send it!
 tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-# Wait for the transaction to be mined, and get the transaction receipt
-print("Waiting for transaction to finish...")
-
 tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-print(f"Done! Contract deployed to {tx_receipt.contractAddress}")
 
 # Working with the contract, you always need
 # Contract Address
@@ -94,7 +86,6 @@ signed_store_txn = w3.eth.account.sign_transaction(
     store_transaction, private_key=private_key
 )
 send_store_tx = w3.eth.send_raw_transaction(signed_store_txn.rawTransaction)
-print("Updating stored Value...")
 tx_receipt = w3.eth.wait_for_transaction_receipt(send_store_tx)
 
 print(simple_storage.functions.retrieve().call())
